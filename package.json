@@ -20,7 +20,9 @@
   "homepage": "https://github.com/PLG-Works/brand-monitoring#readme",
   "dependencies": {
     "@aws-sdk/client-comprehend": "3.105.0",
-    "@google-cloud/language": "^4.3.2"
+    "@google-cloud/language": "^4.3.2",
+    "@plgworks/base": "1.0.0",
+    "qs": "6.10.5"
   },
   "devDependencies": {
     "eslint": "6.5.1",
