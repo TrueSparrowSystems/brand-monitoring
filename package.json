@@ -19,7 +19,8 @@
   },
   "homepage": "https://github.com/PLG-Works/brand-monitoring#readme",
   "dependencies": {
-    "@aws-sdk/client-comprehend": "3.105.0"
+    "@aws-sdk/client-comprehend": "3.105.0",
+    "@google-cloud/language": "^4.3.2"
   },
   "devDependencies": {
     "eslint": "6.5.1",

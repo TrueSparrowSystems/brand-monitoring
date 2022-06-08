@@ -42,6 +42,9 @@ build/Release
 node_modules/
 jspm_packages/
 
+# Test Folder
+test/
+
 # Dev Folder
 .dev
 
@@ -69,4 +72,9 @@ typings/
 
 # dotenv environment variables file
 .env
+
+# Editor / IDE files
+/.idea
+/.idea/*
+.vscode
 
