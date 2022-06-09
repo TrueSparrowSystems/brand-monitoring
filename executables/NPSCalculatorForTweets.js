@@ -10,6 +10,7 @@ const rootPrefix = '..',
   GetMentionedTweetsForUserLib = require(rootPrefix + '/lib/Twitter/GetMentionedTweetsForUser'),
   GetSentimentsFromAWSComprehend = require(rootPrefix + '/lib/awsComprehend/GetSentiments'),
   GetSentimentsFromGoogleNLP = require(rootPrefix + '/lib/googleNLP/GetSentiments'),
+  GenerateTweetsAndSentimentsCSV = require(rootPrefix + '/lib/report/TweetSentiments'),
   NPSCalculatorLib = require(rootPrefix + '/lib/NPSCalculator');
 
 program.allowUnknownOption();
@@ -200,6 +201,16 @@ class NPSCalculatorForTweets {
 
   async _writeDataToCsv() {
     const oThis = this;
+
+    if (oThis.csvRequired) {
+      const params = {
+        tweets: oThis.allTweetsInDuration,
+        sentimentsFromAWSComprehend: oThis.sentimentsFromAWSComprehend,
+        sentimentsFromGoogleNLP: oThis.sentimentsFromGoogleNLP
+      };
+
+      return new GenerateTweetsAndSentimentsCSV(params).perform();
+    }
   }
 }
 
