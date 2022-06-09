@@ -78,3 +78,7 @@ typings/
 /.idea/*
 .vscode
 
+# Report files
+/reports
+/reports/*
+
