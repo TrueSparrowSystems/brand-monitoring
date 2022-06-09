@@ -3,21 +3,35 @@ const program = require('commander');
 /**
  * Script to update expiry time for packages.
  *
- * @module executables/NPSCalculatorForTweets.js
+ * @module executables/NPSCalculatorForTweets
  */
 
 const rootPrefix = '..',
+  GetMentionedTweetsForUserLib = require(rootPrefix + '/lib/Twitter/GetMentionedTweetsForUser'),
   GetSentimentsFromAWSComprehend = require(rootPrefix + '/lib/awsComprehend/GetSentiments'),
   GetSentimentsFromGoogleNLP = require(rootPrefix + '/lib/googleNLP/GetSentiments');
 
 program.allowUnknownOption();
 program.option('--startTime <startTime>', 'Start Timestamp').parse(process.argv);
-program.option('--endTime <endTime>', 'endTimestamp').parse(process.argv);
+program.option('--endTime <endTime>', 'End Timestamp').parse(process.argv);
 program.option('--csvRequired <csvRequired>', 'CSV required(1/0)').parse(process.argv);
+
+program.on('--help', function() {
+  console.log('');
+  console.log('  Example:');
+  console.log('');
+  console.log(' node executables/NPSCalculatorForTweets --startTime 1654759307 --endTime 1654413707 --csvRequired 1');
+  console.log('');
+});
 
 const startTime = program.opts().startTime,
   endTime = program.opts().endTime,
   csvRequired = program.opts().csvRequired;
+
+if (!startTime || !endTime || !csvRequired) {
+  program.help();
+  process.exit(1);
+}
 
 class NPSCalculatorForTweets {
   /**
@@ -39,6 +53,8 @@ class NPSCalculatorForTweets {
     oThis.batchSentimentsFromGoogleNLP = [];
 
     oThis.twitterRequestMeta = {};
+
+    oThis.processNextIteration = null;
   }
 
   /**
@@ -48,22 +64,23 @@ class NPSCalculatorForTweets {
    */
   async perform() {
     const oThis = this;
-    let continueProcessing = 1;
 
-    while (continueProcessing) {
+    oThis.processNextIteration = true;
+
+    while (oThis.processNextIteration) {
       oThis.batchTweets = [];
       oThis.batchSentimentsForAWSComprehend = [];
       oThis.batchSentimentsFromGoogleNLP = [];
 
       await oThis._getTweetsForUser();
 
-      if (oThis.batchTweets.length === 0) {
-        break;
-      }
-
       await oThis._getSentimentAnalysisUsingAwsComprehend();
 
       await oThis._getSentimentAnalysisUsingGoogleNLP();
+
+      oThis.allTweetsInDuration = oThis.allTweetsInDuration.concat(oThis.batchTweets);
+      oThis.sentimentsFromAWSComprehend = oThis.allTweetsInDuration.concat(oThis.batchSentimentsForAWSComprehend);
+      oThis.sentimentsFromGoogleNLP = oThis.allTweetsInDuration.concat(oThis.batchSentimentsFromGoogleNLP);
     }
 
     await oThis._calculateNPS();
@@ -73,8 +90,39 @@ class NPSCalculatorForTweets {
     process.exit(0);
   }
 
+  /**
+   * Get Tweets for user.
+   *
+   * @sets oThis.batchTweets, oThis.processNextIteration
+   *
+   * @returns {Promise<void>}
+   * @private
+   */
   async _getTweetsForUser() {
     const oThis = this;
+
+    const params = {
+      twitterUserId: '1519609900564992004', // plgworks twitter user id
+      maxResults: 5,
+      startTime: oThis.startTime,
+      endTime: oThis.endTime
+    };
+
+    if (oThis.twitterRequestMeta.next_token) {
+      params.paginationToken = oThis.twitterRequestMeta.next_token;
+    }
+
+    const tweetsLibResponse = await new GetMentionedTweetsForUserLib(params).perform().catch(function(err) {
+      console.log('err ----- ', err);
+      // Todo: Add more handling to stop processing
+    });
+
+    oThis.batchTweets = tweetsLibResponse.data;
+    oThis.twitterRequestMeta = tweetsLibResponse.meta;
+
+    if (!oThis.twitterRequestMeta.next_token) {
+      oThis.processNextIteration = false;
+    }
   }
 
   /**
@@ -131,9 +179,9 @@ class NPSCalculatorForTweets {
 }
 
 const performer = new NPSCalculatorForTweets({
-  startTime: oThis.startTime,
-  endTime: oThis.endTime,
-  csvRequired: oThis.csvRequired
+  startTime: startTime,
+  endTime: endTime,
+  csvRequired: csvRequired
 });
 
 performer.perform().then(function(r) {
