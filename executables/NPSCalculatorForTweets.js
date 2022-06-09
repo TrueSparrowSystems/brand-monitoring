@@ -28,8 +28,9 @@ program.on('--help', function() {
 
 const startTime = program.opts().startTime,
   endTime = program.opts().endTime,
-  csvRequired = program.opts().csvRequired;
+  csvRequired = Number(program.opts().csvRequired);
 
+// Todo Check against null and undefined
 if (!startTime || !endTime || !csvRequired) {
   program.help();
   process.exit(1);
@@ -87,13 +88,19 @@ class NPSCalculatorForTweets {
       await oThis._getSentimentAnalysisUsingGoogleNLP();
 
       oThis.allTweetsInDuration = oThis.allTweetsInDuration.concat(oThis.batchTweets);
-      oThis.sentimentsFromAWSComprehend = oThis.allTweetsInDuration.concat(oThis.batchSentimentsForAWSComprehend);
-      oThis.sentimentsFromGoogleNLP = oThis.allTweetsInDuration.concat(oThis.batchSentimentsFromGoogleNLP);
+      oThis.sentimentsFromAWSComprehend = oThis.sentimentsFromAWSComprehend.concat(
+        oThis.batchSentimentsForAWSComprehend
+      );
+      oThis.sentimentsFromGoogleNLP = oThis.sentimentsFromGoogleNLP.concat(oThis.batchSentimentsFromGoogleNLP);
     }
 
     await oThis._calculateNPS();
 
-    await oThis._writeDataToCsv();
+    const csvFilePath = await oThis._writeDataToCsv();
+
+    console.log('PATH TO CSV WITH ANALYSED RESULTS :: ', csvFilePath);
+    console.log('NPS Data with AWS Comprehend :: ', JSON.stringify(oThis.npsCalculationResponse.awsComprehend));
+    console.log('NPS Data with Google NLP :: ', JSON.stringify(oThis.npsCalculationResponse.googleNLP));
 
     process.exit(0);
   }
@@ -110,8 +117,9 @@ class NPSCalculatorForTweets {
     const oThis = this;
 
     const params = {
-      twitterUserId: '1519609900564992004', // plgworks twitter user id
-      maxResults: 5,
+      // Todo : take twitter user id from command options.
+      twitterUserId: '380749300', // plgworks twitter user id
+      maxResults: 100,
       startTime: oThis.startTime,
       endTime: oThis.endTime
     };
@@ -124,7 +132,11 @@ class NPSCalculatorForTweets {
       console.log('Error while Fetching Tweets :: --------- ', err);
     });
 
-    oThis.batchTweets = (tweetsLibResponse && tweetsLibResponse.data) || [];
+    const rawTweets = (tweetsLibResponse && tweetsLibResponse.data) || [];
+    for (const tweetObj of rawTweets) {
+      oThis.batchTweets.push(tweetObj.text);
+    }
+
     oThis.twitterRequestMeta = (tweetsLibResponse && tweetsLibResponse.meta) || {};
 
     if (!oThis.twitterRequestMeta.next_token) {
@@ -135,7 +147,7 @@ class NPSCalculatorForTweets {
   /**
    * Get Sentiment Analysis Using AwsComprehend
    *
-   * @sets oThis.batchSentimentsForAWSComprehend, oThis.sentimentsFromAWSComprehend
+   * @sets oThis.batchSentimentsForAWSComprehend
    * @returns {Promise<void>}
    * @private
    */
@@ -158,13 +170,15 @@ class NPSCalculatorForTweets {
   /**
    * Get Sentiment Analysis Using Google NLP
    *
-   * @sets oThis.batchSentimentsFromGoogleNLP, oThis.sentimentsFromGoogleNLP
+   * @sets oThis.batchSentimentsFromGoogleNLP
    *
    * @returns {Promise<void>}
    * @private
    */
   async _getSentimentAnalysisUsingGoogleNLP() {
     const oThis = this;
+
+    // Todo :: Explore magnitude from response as well for calculating NPS.
 
     const sentimentsFromGoogleNLP = await new GetSentimentsFromGoogleNLP(oThis.batchTweets)
       .perform()
@@ -199,18 +213,26 @@ class NPSCalculatorForTweets {
     ).perform();
   }
 
+  /**
+   * Writes analysed data to csv.
+   *
+   * @returns {Promise<void|*[]|never|[]>}
+   * @private
+   */
   async _writeDataToCsv() {
     const oThis = this;
 
-    if (oThis.csvRequired) {
-      const params = {
-        tweets: oThis.allTweetsInDuration,
-        sentimentsFromAWSComprehend: oThis.sentimentsFromAWSComprehend,
-        sentimentsFromGoogleNLP: oThis.sentimentsFromGoogleNLP
-      };
-
-      return new GenerateTweetsAndSentimentsCSV(params).perform();
+    if (!oThis.csvRequired) {
+      return;
     }
+
+    const params = {
+      tweets: oThis.allTweetsInDuration,
+      sentimentsFromAWSComprehend: oThis.sentimentsFromAWSComprehend,
+      sentimentsFromGoogleNLP: oThis.sentimentsFromGoogleNLP
+    };
+
+    return new GenerateTweetsAndSentimentsCSV(params).perform();
   }
 }
 
