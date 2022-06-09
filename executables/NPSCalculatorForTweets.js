@@ -168,6 +168,12 @@ class NPSCalculatorForTweets {
     console.log('sentimentsFromGoogleNLP ================', oThis.sentimentsFromGoogleNLP);
   }
 
+  /**
+   * Calculate NPS for tweets
+   *
+   * @returns {Promise<void>}
+   * @private
+   */
   async _calculateNPS() {
     const oThis = this;
     // Return {google/Aws : NPS score, no. of promotors, no. of detractors, total no. of tweets}
