@@ -3,13 +3,12 @@ const program = require('commander');
 /**
  * Script to update expiry time for packages.
  *
- * @module executables/NPSCaculatorForTweets.js
+ * @module executables/NPSCalculatorForTweets.js
  */
 
 const rootPrefix = '..',
-  logger = require(rootPrefix + '/lib/logger/customConsoleLogger');
-
-const limit = 50;
+  GetSentimentsFromAWSComprehend = require(rootPrefix + '/lib/awsComprehend/GetSentiments'),
+  GetSentimentsFromGoogleNLP = require(rootPrefix + '/lib/googleNLP/GetSentiments');
 
 program.allowUnknownOption();
 program.option('--startTime <startTime>', 'Start Timestamp').parse(process.argv);
@@ -78,12 +77,47 @@ class NPSCalculatorForTweets {
     const oThis = this;
   }
 
+  /**
+   * Get Sentiment Analysis Using AwsComprehend
+   *
+   * @sets oThis.batchSentimentsForAWSComprehend, oThis.sentimentsFromAWSComprehend
+   * @returns {Promise<void>}
+   * @private
+   */
   async _getSentimentAnalysisUsingAwsComprehend() {
     const oThis = this;
+
+    const sentimentsFromAWSComprehend = await new GetSentimentsFromAWSComprehend(oThis.batchTweets).perform();
+
+    if (sentimentsFromAWSComprehend.length !== 0) {
+      oThis.batchSentimentsForAWSComprehend = sentimentsFromAWSComprehend;
+      oThis.sentimentsFromAWSComprehend = oThis.sentimentsFromAWSComprehend.concat(
+        oThis.batchSentimentsForAWSComprehend
+      );
+    }
+
+    console.log('sentimentsFromAWSComprehend ================', oThis.sentimentsFromAWSComprehend);
   }
 
+  /**
+   * Get Sentiment Analysis Using Google NLP
+   *
+   * @sets oThis.batchSentimentsFromGoogleNLP, oThis.sentimentsFromGoogleNLP
+   *
+   * @returns {Promise<void>}
+   * @private
+   */
   async _getSentimentAnalysisUsingGoogleNLP() {
     const oThis = this;
+
+    const sentimentsFromGoogleNLP = await new GetSentimentsFromGoogleNLP(oThis.batchTweets).perform();
+
+    if (sentimentsFromGoogleNLP.length !== 0) {
+      oThis.batchSentimentsFromGoogleNLP = sentimentsFromGoogleNLP;
+      oThis.sentimentsFromGoogleNLP = oThis.sentimentsFromGoogleNLP.concat(oThis.batchSentimentsFromGoogleNLP);
+    }
+
+    console.log('sentimentsFromGoogleNLP ================', oThis.sentimentsFromGoogleNLP);
   }
 
   async _calculateNPS() {
