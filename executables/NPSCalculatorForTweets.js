@@ -141,7 +141,11 @@ class NPSCalculatorForTweets {
   async _getSentimentAnalysisUsingAwsComprehend() {
     const oThis = this;
 
-    const sentimentsFromAWSComprehend = await new GetSentimentsFromAWSComprehend(oThis.batchTweets).perform();
+    const sentimentsFromAWSComprehend = await new GetSentimentsFromAWSComprehend(oThis.batchTweets)
+      .perform()
+      .catch(function(err) {
+        console.log('Error while Fetching sentiments from Aws Comprehend :: --------- ', err);
+      });
 
     if (sentimentsFromAWSComprehend.length !== 0) {
       oThis.batchSentimentsForAWSComprehend = sentimentsFromAWSComprehend;
@@ -161,7 +165,11 @@ class NPSCalculatorForTweets {
   async _getSentimentAnalysisUsingGoogleNLP() {
     const oThis = this;
 
-    const sentimentsFromGoogleNLP = await new GetSentimentsFromGoogleNLP(oThis.batchTweets).perform();
+    const sentimentsFromGoogleNLP = await new GetSentimentsFromGoogleNLP(oThis.batchTweets)
+      .perform()
+      .catch(function(err) {
+        console.log('Error while Fetching sentiments from Google NLP :: --------- ', err);
+      });
 
     if (sentimentsFromGoogleNLP.length !== 0) {
       oThis.batchSentimentsFromGoogleNLP = sentimentsFromGoogleNLP;
@@ -181,7 +189,8 @@ class NPSCalculatorForTweets {
   async _calculateNPS() {
     const oThis = this;
 
-    const totalTweets = Number(oThis.allTweetsInDuration.length) + 1;
+    const totalTweets = Number(oThis.allTweetsInDuration.length);
+
     oThis.npsCalculationResponse = await new NPSCalculatorLib(
       oThis.sentimentsFromAWSComprehend,
       oThis.sentimentsFromGoogleNLP,
