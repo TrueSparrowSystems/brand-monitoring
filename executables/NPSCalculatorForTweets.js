@@ -76,6 +76,11 @@ class NPSCalculatorForTweets {
 
       await oThis._getTweetsForUser();
 
+      if (oThis.batchTweets.length == 0) {
+        console.log(' --- No more tweets to process --- ');
+        break;
+      }
+
       await oThis._getSentimentAnalysisUsingAwsComprehend();
 
       await oThis._getSentimentAnalysisUsingGoogleNLP();
@@ -115,12 +120,11 @@ class NPSCalculatorForTweets {
     }
 
     const tweetsLibResponse = await new GetMentionedTweetsForUserLib(params).perform().catch(function(err) {
-      console.log('err ----- ', err);
-      // Todo: Add more handling to stop processing
+      console.log('Error while Fetching Tweets :: --------- ', err);
     });
 
-    oThis.batchTweets = tweetsLibResponse.data;
-    oThis.twitterRequestMeta = tweetsLibResponse.meta;
+    oThis.batchTweets = (tweetsLibResponse && tweetsLibResponse.data) || [];
+    oThis.twitterRequestMeta = (tweetsLibResponse && tweetsLibResponse.meta) || {};
 
     if (!oThis.twitterRequestMeta.next_token) {
       oThis.processNextIteration = false;
@@ -141,12 +145,9 @@ class NPSCalculatorForTweets {
 
     if (sentimentsFromAWSComprehend.length !== 0) {
       oThis.batchSentimentsForAWSComprehend = sentimentsFromAWSComprehend;
-      oThis.sentimentsFromAWSComprehend = oThis.sentimentsFromAWSComprehend.concat(
-        oThis.batchSentimentsForAWSComprehend
-      );
     }
 
-    console.log('sentimentsFromAWSComprehend ================', oThis.sentimentsFromAWSComprehend);
+    console.log('sentimentsFromAWSComprehend ================', oThis.batchSentimentsForAWSComprehend);
   }
 
   /**
@@ -164,10 +165,9 @@ class NPSCalculatorForTweets {
 
     if (sentimentsFromGoogleNLP.length !== 0) {
       oThis.batchSentimentsFromGoogleNLP = sentimentsFromGoogleNLP;
-      oThis.sentimentsFromGoogleNLP = oThis.sentimentsFromGoogleNLP.concat(oThis.batchSentimentsFromGoogleNLP);
     }
 
-    console.log('sentimentsFromGoogleNLP ================', oThis.sentimentsFromGoogleNLP);
+    console.log('sentimentsFromGoogleNLP ================', oThis.batchSentimentsFromGoogleNLP);
   }
 
   /**
