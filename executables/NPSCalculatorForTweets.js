@@ -9,7 +9,8 @@ const program = require('commander');
 const rootPrefix = '..',
   GetMentionedTweetsForUserLib = require(rootPrefix + '/lib/Twitter/GetMentionedTweetsForUser'),
   GetSentimentsFromAWSComprehend = require(rootPrefix + '/lib/awsComprehend/GetSentiments'),
-  GetSentimentsFromGoogleNLP = require(rootPrefix + '/lib/googleNLP/GetSentiments');
+  GetSentimentsFromGoogleNLP = require(rootPrefix + '/lib/googleNLP/GetSentiments'),
+  NPSCalculatorLib = require(rootPrefix + '/lib/NPSCalculator');
 
 program.allowUnknownOption();
 program.option('--startTime <startTime>', 'Start Timestamp').parse(process.argv);
@@ -53,8 +54,9 @@ class NPSCalculatorForTweets {
     oThis.batchSentimentsFromGoogleNLP = [];
 
     oThis.twitterRequestMeta = {};
-
     oThis.processNextIteration = null;
+
+    oThis.npsCalculationResponse = {};
   }
 
   /**
@@ -171,12 +173,20 @@ class NPSCalculatorForTweets {
   /**
    * Calculate NPS for tweets
    *
+   * @sets oThis.npsCalculationResponse
+   *
    * @returns {Promise<void>}
    * @private
    */
   async _calculateNPS() {
     const oThis = this;
-    // Return {google/Aws : NPS score, no. of promotors, no. of detractors, total no. of tweets}
+
+    const totalTweets = Number(oThis.allTweetsInDuration.length) + 1;
+    oThis.npsCalculationResponse = await new NPSCalculatorLib(
+      oThis.sentimentsFromAWSComprehend,
+      oThis.sentimentsFromGoogleNLP,
+      totalTweets
+    ).perform();
   }
 
   async _writeDataToCsv() {
