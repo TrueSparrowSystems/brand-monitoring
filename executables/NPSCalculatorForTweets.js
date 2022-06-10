@@ -53,6 +53,7 @@ class NPSCalculatorForTweets {
   constructor(params) {
     const oThis = this;
 
+    oThis.twitterUserId = params.twitterUserId;
     oThis.startTime = params.startTime;
     oThis.endTime = params.endTime;
     oThis.csvRequired = params.csvRequired;
@@ -127,8 +128,7 @@ class NPSCalculatorForTweets {
     const oThis = this;
 
     const params = {
-      // Todo : take twitter user id from command options.
-      twitterUserId: '380749300', // plgworks twitter user id
+      twitterUserId: oThis.twitterUserId, // plgworks twitter user id
       maxResults: 100,
       startTime: oThis.startTime,
       endTime: oThis.endTime
