@@ -11,9 +11,11 @@ const rootPrefix = '..',
   GetSentimentsFromAWSComprehend = require(rootPrefix + '/lib/awsComprehend/GetSentiments'),
   GetSentimentsFromGoogleNLP = require(rootPrefix + '/lib/googleNLP/GetSentiments'),
   GenerateTweetsAndSentimentsCSV = require(rootPrefix + '/lib/report/TweetSentiments'),
-  NPSCalculatorLib = require(rootPrefix + '/lib/NPSCalculator');
+  NPSCalculatorLib = require(rootPrefix + '/lib/NPSCalculator'),
+  CommonValidator = require(rootPrefix + '/lib/validators/Common');
 
 program.allowUnknownOption();
+program.option('--twitterUserId <csvRequired>', 'Twitter User Id').parse(process.argv);
 program.option('--startTime <startTime>', 'Start Timestamp').parse(process.argv);
 program.option('--endTime <endTime>', 'End Timestamp').parse(process.argv);
 program.option('--csvRequired <csvRequired>', 'CSV required(1/0)').parse(process.argv);
@@ -22,16 +24,24 @@ program.on('--help', function() {
   console.log('');
   console.log('  Example:');
   console.log('');
-  console.log(' node executables/NPSCalculatorForTweets --startTime 1654759307 --endTime 1654413707 --csvRequired 1');
+  console.log(
+    ' node executables/NPSCalculatorForTweets --twitterUserId 380749300  --startTime 1654759307 --endTime 1654413707 --csvRequired 1'
+  );
   console.log('');
 });
 
-const startTime = program.opts().startTime,
+const twitterUserId = program.opts().twitterUserId,
   endTime = program.opts().endTime,
-  csvRequired = Number(program.opts().csvRequired);
+  csvRequired = Number(program.opts().csvRequired),
+  startTime = program.opts().startTime;
 
 // Todo Check against null and undefined
-if (!startTime || !endTime || !csvRequired) {
+if (
+  CommonValidator.isVarNullOrUndefined(twitterUserId) ||
+  CommonValidator.isVarNullOrUndefined(startTime) ||
+  CommonValidator.isVarNullOrUndefined(endTime) ||
+  CommonValidator.isVarNullOrUndefined(csvRequired)
+) {
   program.help();
   process.exit(1);
 }
