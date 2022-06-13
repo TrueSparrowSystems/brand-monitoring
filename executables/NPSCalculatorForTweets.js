@@ -11,7 +11,8 @@ const rootPrefix = '..',
   GetSentimentsFromAWSComprehend = require(rootPrefix + '/lib/awsComprehend/GetSentiments'),
   GenerateTweetsAndSentimentsCSV = require(rootPrefix + '/lib/report/TweetSentiments'),
   NPSCalculatorLib = require(rootPrefix + '/lib/NPSCalculator'),
-  CommonValidator = require(rootPrefix + '/lib/validators/Common');
+  CommonValidator = require(rootPrefix + '/lib/validators/Common'),
+  awsComprehendConstant = require(rootPrefix + '/lib/globalConstant/awsComprehend');
 
 program.allowUnknownOption();
 program.option('--twitterUserId <csvRequired>', 'Twitter User Id').parse(process.argv);
@@ -24,7 +25,7 @@ program.on('--help', function() {
   console.log('  Example:');
   console.log('');
   console.log(
-    ' node executables/NPSCalculatorForTweets --twitterUserId 380749300  --startTime 1654759307 --endTime 1654413707 --csvRequired 1'
+    ' node executables/NPSCalculatorForTweets --twitterUserId 380749300  --startTime 1654992055 --endTime 1655078455 --csvRequired 1'
   );
   console.log('');
 });
@@ -62,6 +63,7 @@ class NPSCalculatorForTweets {
     oThis.batchTweets = [];
     oThis.batchSentimentsForAWSComprehend = [];
 
+    oThis.batchLanguageToTweetsMap = {};
     oThis.twitterRequestMeta = {};
     oThis.processNextIteration = null;
 
@@ -81,15 +83,16 @@ class NPSCalculatorForTweets {
     while (oThis.processNextIteration) {
       oThis.batchTweets = [];
       oThis.batchSentimentsForAWSComprehend = [];
+      oThis.batchLanguageToTweetsMap = {};
 
       await oThis._getTweetsForUser();
+
+      await oThis._getSentimentAnalysisUsingAwsComprehend();
 
       if (oThis.batchTweets.length == 0) {
         console.log(' --- No more tweets to process --- ');
         break;
       }
-
-      await oThis._getSentimentAnalysisUsingAwsComprehend();
 
       oThis.allTweetsInDuration = oThis.allTweetsInDuration.concat(oThis.batchTweets);
       oThis.sentimentsFromAWSComprehend = oThis.sentimentsFromAWSComprehend.concat(
@@ -133,9 +136,15 @@ class NPSCalculatorForTweets {
       console.log('Error while Fetching Tweets :: --------- ', err);
     });
 
-    const rawTweets = (tweetsLibResponse && tweetsLibResponse.data) || [];
+    const rawTweets = (tweetsLibResponse && tweetsLibResponse.data) || [],
+      awsComprehendSupportedLanguages = awsComprehendConstant.awsComprehendSupportedLanguages;
     for (const tweetObj of rawTweets) {
-      oThis.batchTweets.push(tweetObj.text);
+      const tweetLanguage = tweetObj.lang;
+
+      if (awsComprehendSupportedLanguages.includes(tweetLanguage)) {
+        oThis.batchLanguageToTweetsMap[tweetLanguage] = oThis.batchLanguageToTweetsMap[tweetLanguage] || [];
+        oThis.batchLanguageToTweetsMap[tweetLanguage].push(tweetObj.text);
+      }
     }
 
     oThis.twitterRequestMeta = (tweetsLibResponse && tweetsLibResponse.meta) || {};
@@ -155,14 +164,20 @@ class NPSCalculatorForTweets {
   async _getSentimentAnalysisUsingAwsComprehend() {
     const oThis = this;
 
-    const sentimentsFromAWSComprehend = await new GetSentimentsFromAWSComprehend(oThis.batchTweets)
-      .perform()
-      .catch(function(err) {
-        console.log('Error while Fetching sentiments from Aws Comprehend :: --------- ', err);
-      });
+    for (const tweetLanguage in oThis.batchLanguageToTweetsMap) {
+      const documents = oThis.batchLanguageToTweetsMap[tweetLanguage];
+      const sentimentsFromAWSComprehend = await new GetSentimentsFromAWSComprehend(documents, tweetLanguage)
+        .perform()
+        .catch(function(err) {
+          console.log('Error while Fetching sentiments from Aws Comprehend :: --------- ', err);
+        });
 
-    if (sentimentsFromAWSComprehend.length !== 0) {
-      oThis.batchSentimentsForAWSComprehend = sentimentsFromAWSComprehend;
+      if (sentimentsFromAWSComprehend.length !== 0) {
+        oThis.batchTweets = oThis.batchTweets.concat(documents);
+        oThis.batchSentimentsForAWSComprehend = oThis.batchSentimentsForAWSComprehend.concat(
+          sentimentsFromAWSComprehend
+        );
+      }
     }
 
     console.log('sentimentsFromAWSComprehend ================', oThis.batchSentimentsForAWSComprehend);
