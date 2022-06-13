@@ -35,7 +35,6 @@ const twitterUserId = program.opts().twitterUserId,
   csvRequired = Number(program.opts().csvRequired),
   startTime = program.opts().startTime;
 
-// Todo Check against null and undefined
 if (
   CommonValidator.isVarNullOrUndefined(twitterUserId) ||
   CommonValidator.isVarNullOrUndefined(startTime) ||
@@ -128,7 +127,7 @@ class NPSCalculatorForTweets {
     const oThis = this;
 
     const params = {
-      twitterUserId: oThis.twitterUserId, // plgworks twitter user id
+      twitterUserId: oThis.twitterUserId,
       maxResults: 100,
       startTime: oThis.startTime,
       endTime: oThis.endTime
