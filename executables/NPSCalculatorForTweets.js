@@ -9,7 +9,6 @@ const program = require('commander');
 const rootPrefix = '..',
   GetMentionedTweetsForUserLib = require(rootPrefix + '/lib/Twitter/GetMentionedTweetsForUser'),
   GetSentimentsFromAWSComprehend = require(rootPrefix + '/lib/awsComprehend/GetSentiments'),
-  GetSentimentsFromGoogleNLP = require(rootPrefix + '/lib/googleNLP/GetSentiments'),
   GenerateTweetsAndSentimentsCSV = require(rootPrefix + '/lib/report/TweetSentiments'),
   NPSCalculatorLib = require(rootPrefix + '/lib/NPSCalculator'),
   CommonValidator = require(rootPrefix + '/lib/validators/Common');
@@ -59,11 +58,9 @@ class NPSCalculatorForTweets {
 
     oThis.allTweetsInDuration = [];
     oThis.sentimentsFromAWSComprehend = [];
-    oThis.sentimentsFromGoogleNLP = [];
 
     oThis.batchTweets = [];
     oThis.batchSentimentsForAWSComprehend = [];
-    oThis.batchSentimentsFromGoogleNLP = [];
 
     oThis.twitterRequestMeta = {};
     oThis.processNextIteration = null;
@@ -84,7 +81,6 @@ class NPSCalculatorForTweets {
     while (oThis.processNextIteration) {
       oThis.batchTweets = [];
       oThis.batchSentimentsForAWSComprehend = [];
-      oThis.batchSentimentsFromGoogleNLP = [];
 
       await oThis._getTweetsForUser();
 
@@ -95,13 +91,10 @@ class NPSCalculatorForTweets {
 
       await oThis._getSentimentAnalysisUsingAwsComprehend();
 
-      await oThis._getSentimentAnalysisUsingGoogleNLP();
-
       oThis.allTweetsInDuration = oThis.allTweetsInDuration.concat(oThis.batchTweets);
       oThis.sentimentsFromAWSComprehend = oThis.sentimentsFromAWSComprehend.concat(
         oThis.batchSentimentsForAWSComprehend
       );
-      oThis.sentimentsFromGoogleNLP = oThis.sentimentsFromGoogleNLP.concat(oThis.batchSentimentsFromGoogleNLP);
     }
 
     await oThis._calculateNPS();
@@ -110,7 +103,6 @@ class NPSCalculatorForTweets {
 
     console.log('PATH TO CSV WITH ANALYSED RESULTS :: ', csvFilePath);
     console.log('NPS Data with AWS Comprehend :: ', JSON.stringify(oThis.npsCalculationResponse.awsComprehend));
-    console.log('NPS Data with Google NLP :: ', JSON.stringify(oThis.npsCalculationResponse.googleNLP));
 
     process.exit(0);
   }
@@ -177,32 +169,6 @@ class NPSCalculatorForTweets {
   }
 
   /**
-   * Get Sentiment Analysis Using Google NLP
-   *
-   * @sets oThis.batchSentimentsFromGoogleNLP
-   *
-   * @returns {Promise<void>}
-   * @private
-   */
-  async _getSentimentAnalysisUsingGoogleNLP() {
-    const oThis = this;
-
-    // Todo :: Explore magnitude from response as well for calculating NPS.
-
-    const sentimentsFromGoogleNLP = await new GetSentimentsFromGoogleNLP(oThis.batchTweets)
-      .perform()
-      .catch(function(err) {
-        console.log('Error while Fetching sentiments from Google NLP :: --------- ', err);
-      });
-
-    if (sentimentsFromGoogleNLP.length !== 0) {
-      oThis.batchSentimentsFromGoogleNLP = sentimentsFromGoogleNLP;
-    }
-
-    console.log('sentimentsFromGoogleNLP ================', oThis.batchSentimentsFromGoogleNLP);
-  }
-
-  /**
    * Calculate NPS for tweets
    *
    * @sets oThis.npsCalculationResponse
@@ -215,11 +181,7 @@ class NPSCalculatorForTweets {
 
     const totalTweets = Number(oThis.allTweetsInDuration.length);
 
-    oThis.npsCalculationResponse = await new NPSCalculatorLib(
-      oThis.sentimentsFromAWSComprehend,
-      oThis.sentimentsFromGoogleNLP,
-      totalTweets
-    ).perform();
+    oThis.npsCalculationResponse = await new NPSCalculatorLib(oThis.sentimentsFromAWSComprehend, totalTweets).perform();
   }
 
   /**
@@ -237,8 +199,7 @@ class NPSCalculatorForTweets {
 
     const params = {
       tweets: oThis.allTweetsInDuration,
-      sentimentsFromAWSComprehend: oThis.sentimentsFromAWSComprehend,
-      sentimentsFromGoogleNLP: oThis.sentimentsFromGoogleNLP
+      sentimentsFromAWSComprehend: oThis.sentimentsFromAWSComprehend
     };
 
     return new GenerateTweetsAndSentimentsCSV(params).perform();
@@ -246,6 +207,7 @@ class NPSCalculatorForTweets {
 }
 
 const performer = new NPSCalculatorForTweets({
+  twitterUserId: twitterUserId,
   startTime: startTime,
   endTime: endTime,
   csvRequired: csvRequired
