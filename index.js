@@ -1,18 +1,17 @@
 const rootPrefix = '.',
-  GetNPSForTweets = require(rootPrefix + '/lib/User/GetNPS');
+  GetNPSForTweets = require(rootPrefix + '/lib/GetNPS');
 /**
  * Class exposed by this package
  *
  * @class BrandMonitoring
  */
 class BrandMonitoring {
-  constructor(twitterUserId, startTime, endTime, csvRequired) {
+  constructor(twitterUserId, startTime, endTime) {
     const oThis = this;
 
     oThis.twitterUserId = twitterUserId;
     oThis.startTime = startTime;
     oThis.endTime = endTime;
-    oThis.csvRequired = csvRequired;
   }
 
   /**
@@ -26,11 +25,10 @@ class BrandMonitoring {
     const params = {
       twitterUserId: oThis.twitterUserId,
       startTime: oThis.startTime,
-      endTime: oThis.endTime,
-      csvRequired: oThis.csvRequired
+      endTime: oThis.endTime
     };
 
-    new GetNPSForTweets(params).perform();
+    return new GetNPSForTweets(params).perform();
   }
 }
 
