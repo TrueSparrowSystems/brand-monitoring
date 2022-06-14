@@ -24,13 +24,13 @@ For a large dataset of tweets and their sentiments given by AWS Comprehend, we a
 ## Install NPM
 
 ```shell script
-npm install @plgworks/brand-monitoring
+npm install @plgworks/brand-monitoring --save
 ```
 
 ## Initialize
 ```
 const BrandMonitoring = require('@plgworks/brand-monitoring');
-const brandmonitoringObj = new BrandMonitoring(twitterUserId, startTimestamp, endTimestamp);
+const brandmonitoring = new BrandMonitoring(twitterUserId, startTimestamp, endTimestamp);
 ```
 
 ### Initialization Params
@@ -42,5 +42,5 @@ const brandmonitoringObj = new BrandMonitoring(twitterUserId, startTimestamp, en
 
 ### Get NPS
 ```
-brandmonitoringObj.getNPS();
+brandmonitoring.getNPS();
 ```
