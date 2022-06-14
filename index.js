@@ -1,34 +1,32 @@
 const rootPrefix = '.',
-  GetNPSForTweets = require(rootPrefix + '/lib/GetNPS');
+  GetStats = require(rootPrefix + '/lib/GetStats'),
+  configProvider = require(rootPrefix + '/lib/configProvider');
+
 /**
  * Class exposed by this package
  *
  * @class BrandMonitoring
  */
 class BrandMonitoring {
-  constructor(twitterUserId, startTime, endTime) {
-    const oThis = this;
-
-    oThis.twitterUserId = twitterUserId;
-    oThis.startTime = startTime;
-    oThis.endTime = endTime;
+  constructor(twitterApiConfig, awsComprehendConfig) {
+    // Saving the params in-memory via configProvider
+    configProvider.setConfig('twitterApiConfig', twitterApiConfig);
+    configProvider.setConfig('awsComprehendConfig', awsComprehendConfig);
   }
 
   /**
-   * Get NPS result.
+   * Get statistics.
    *
    * @return {Promise<void>}
    */
-  getNPS() {
-    const oThis = this;
-
+  getStats(reportParams) {
     const params = {
-      twitterUserId: oThis.twitterUserId,
-      startTime: oThis.startTime,
-      endTime: oThis.endTime
+      twitterUserId: reportParams.twitterUserId,
+      startTimestamp: reportParams.startTimestamp,
+      endTimestamp: reportParams.endTimestamp
     };
 
-    return new GetNPSForTweets(params).perform();
+    return new GetStats(params).perform();
   }
 }
 
