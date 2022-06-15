@@ -37,16 +37,15 @@ const brandmonitoring = new BrandMonitoring(twitterApiConfig, awsComprehendConfi
 ```
 
 ### Initialization Params
-**1. `twitterApiConfig`** is an object which has following key(s).
+- **twitterApiConfig** is an object which has following key(s).
 
-- **bearerToken**: It is used to have a more secure point of entry to use Twitter APIs, and can be obtained from the developer portal inside the keys and tokens section of your Twitter App's settings.
+    - **bearerToken**: It is used to have a more secure point of entry to use Twitter APIs, and can be obtained from the developer portal inside the keys and tokens section of your Twitter App's settings.
 
-**2. `awsComprehendConfig`** is an object which contains AWS Comprehend access credentials. It has following keys.
+- **awsComprehendConfig** is an object which contains AWS Comprehend access credentials. It has following keys.
 
-- **region**: It is the AWS region.
-- **accessKeyId**: AWS uses this to verify your identity and grant or deny you access to specific resources.
-- **secretAccessKey**: AWS uses this to verify your identity and grant or deny you access to specific resources.
-<br>
+    - **region**: It is the AWS region.
+    - **accessKeyId**: AWS uses this to verify your identity and grant or deny you access to specific resources.
+    - **secretAccessKey**: AWS uses this to verify your identity and grant or deny you access to specific resources.
 
 ## Get Statistics
 Once the Brand Monitoring module is initialized, the next step is to perform sentimental analysis on tweets.
@@ -65,7 +64,7 @@ const reportParams = {
 const stats = await brandmonitoring.getStats(reportParams);
 ```
 
-**`reportParams`** is an object with following keys.
+**reportParams** is an object with following keys.
 - **twitterUsername**: Twitter username for which you want to generate the stats. Example: @PLGWorks
 - **startTimestamp**: Start timestamp used to search tweets
 - **endTimestamp**: End timestamp used to search tweets
