@@ -50,7 +50,7 @@ Once the Brand Monitoring module is initialized, the next step is to perform sen
 
 ```js
 const reportParams = {
-  twitterUserId: '<twitterUserId>',
+  twitterUsername: '<twitterUsername>',
   startTimestamp: '<startTimestamp>',
   endTimestamp: '<endTimestamp>',
   awsThreshold: {
