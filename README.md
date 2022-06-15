@@ -12,7 +12,7 @@ For a large dataset of tweets and their sentiments given by AWS Comprehend, we m
 
 ## Prerequisites
 - You will need a Twitter developer account and you should have created a Twitter App.
-- You will also need an AWS account.
+- You will also need an AWS account and enable AWS Comprehend.
 
 ## Install NPM
 
@@ -25,37 +25,37 @@ npm install @plgworks/brand-monitoring --save
 const BrandMonitoring = require('@plgworks/brand-monitoring');
 
 const twitterApiConfig = {
-  bearer_token: '<bearer_token>'
+  bearerToken: '<bearerToken>'
 };
 
 const awsComprehendConfig = {
   region: '<region>',
-  access_key_id: '<access_key_id>',
-  secret_access_key: '<secret_access_key>'
+  accessKeyId: '<accessKeyId>',
+  secretAccessKey: '<secretAccessKey>'
 };
 
 const brandmonitoring = new BrandMonitoring(twitterApiConfig, awsComprehendConfig);
 ```
 
 ### Initialization Params
-**1. `twitterApiConfig`** is an object which contains bearer token.
+**1. `twitterApiConfig`** is an object which has following key(s).
 
-- **bearer_token**: It is used to have a more secure point of entry for using the Twitter APIs, and can be obtained from the developer portal inside the keys and tokens section of your App's settings.
+- **bearerToken**: It is used to have a more secure point of entry for using the Twitter APIs, and can be obtained from the developer portal inside the keys and tokens section of your App's settings.
 
-**2. `awsComprehendConfig`** is an object which contains AWS Comprehend access credentials.
+**2. `awsComprehendConfig`** is an object which contains AWS Comprehend access credentials. It has following keys.
 
 - **region**: It is the AWS region.
-- **access_key_id**: AWS uses this to verify your identity and grant or deny you access to specific resources.
-- **secret_access_key**: AWS uses this to verify your identity and grant or deny you access to specific resources.
+- **accessKeyId**: AWS uses this to verify your identity and grant or deny you access to specific resources.
+- **secretAccessKey**: AWS uses this to verify your identity and grant or deny you access to specific resources.
 <br>
 
-### Get Statistics
+## Get Statistics
 
 ```js
 const reportParams = {
-  twitterUserId: '<twitter_user_id>',
-  startTimestamp: '<start_timestamp>',
-  endTimestamp: '<end_timestamp>',
+  twitterUserId: '<twitterUserId>',
+  startTimestamp: '<startTimestamp>',
+  endTimestamp: '<endTimestamp>',
   awsThreshold: {
     positive: '<positive>',
     negative: '<negative>'
@@ -65,12 +65,12 @@ const reportParams = {
 brandmonitoring.getStats(reportParams);
 ```
 
-**`reportParams`** is an object which contains the twitter account id and the duration.
+**`reportParams`** is an object which contains the twitter account id and the report duration. Following are the keys in this object.
 - twitterUserId: It is the account id of the twitter handle of which you want to generate the stats. You can find your twitter id using this [twitter API](https://developer.twitter.com/en/docs/labs/tweets-and-users/api-reference/get-users-by-username). 
 - startTimestamp: It is the start timestamp of the duration in which you want to calculate the statistics.
 - endTimestamp: It is the end timestamp of the duration in which you want to calculate the statistics.
 - awsThreshold: It is an object which contains aws threshold values. This is an optional parameter. If not passed or incorrect values passed, default values will be used. 
-  - positive: It is the threshold of aws sentiment used to determine promoters. Range is from 0 to 1.
-  - negative: It is the threshold of aws sentiment used to determine detractors. Range is from 0 to 1.
+  - positive: It is the threshold of AWS Comprehend Sentiment score used to determine promoters. Range is from 0 to 1. If sentiment is positive and the sentiment score is greater than this threshold, then we consider the tweet as positive (from promoter).
+  - negative: It is the threshold of AWS Comprehend Sentiment score used to determine detractors. Range is from 0 to 1. If sentiment is negative and the sentiment score is greater than this threshold, then we consider the tweet as negative (from detractor).
 
 
