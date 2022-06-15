@@ -5,13 +5,13 @@ Brand Monitor helps you understand your twitter audience better. This module pro
 
 ## Approach
 
-Using [twitter api](https://developer.twitter.com/en/docs/twitter-api/tweets/timelines/api-reference/get-users-id-mentions), we gather the tweet mentions of a particular account. These tweets are within the given time duration.
+Using [Twitter API](https://developer.twitter.com/en/docs/twitter-api/tweets/timelines/api-reference/get-users-id-mentions), we gather the tweet mentions of a particular account. These tweets are within the given time duration.
 
 We get the sentiments of these tweets using [AWS Comprehend](https://docs.aws.amazon.com/comprehend/latest/dg/API_BatchDetectSentiment.html). Based on these sentiments, we find out the stats.
 
 ## Prerequisites
-- Twitter App
-- AWS Comprehend
+- [Twitter Developer App](https://developer.twitter.com/en/docs/twitter-api/getting-started/getting-access-to-the-twitter-api)
+- [AWS Comprehend](https://docs.aws.amazon.com/comprehend/index.html)
 
 ## Install
 
@@ -62,7 +62,7 @@ const reportParams = {
   }
 };
 
-brandmonitoring.getStats(reportParams);
+const stats = await brandmonitoring.getStats(reportParams);
 ```
 
 **`reportParams`** is an object with following keys.
