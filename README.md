@@ -37,13 +37,13 @@ const brandmonitoring = new BrandMonitoring(twitterApiConfig, awsComprehendConfi
 ```
 
 ### Initialization Params
-- **twitterApiConfig** is an object which has following key(s).
+- **twitterApiConfig** Object which has following key(s).
 
-    - **bearerToken**: It is used to have a more secure point of entry to use Twitter APIs, and can be obtained from the developer portal inside the keys and tokens section of your Twitter App's settings.
+    - **bearerToken**: Used to have a more secure point of entry to use Twitter APIs, and can be obtained from the developer portal inside the keys and tokens section of your Twitter App's settings.
 
-- **awsComprehendConfig** is an object which contains AWS Comprehend access credentials. It has following keys.
+- **awsComprehendConfig** Object which contains AWS Comprehend access credentials. It has following keys.
 
-    - **region**: It is the AWS region.
+    - **region**: AWS region.
     - **accessKeyId**: AWS uses this to verify your identity and grant or deny you access to specific resources.
     - **secretAccessKey**: AWS uses this to verify your identity and grant or deny you access to specific resources.
 
@@ -64,11 +64,11 @@ const reportParams = {
 const stats = await brandmonitoring.getStats(reportParams);
 ```
 
-**reportParams** is an object with following keys.
+**reportParams** Object with following keys.
 - **twitterUsername**: Twitter username for which you want to generate the stats. Example: @PLGWorks
 - **startTimestamp**: Start timestamp used to search tweets
 - **endTimestamp**: End timestamp used to search tweets
-- **awsThreshold**: (Optional) It is an object which contains AWS Comprehend sentiment score threshold values. Default positive value is 0.55 and negative value is 0.40
+- **awsThreshold**: (Optional) Object which contains AWS Comprehend sentiment score threshold values. Default positive value is 0.55 and negative value is 0.40
   - **positive**: Range is from 0 to 1. If sentiment is positive and the sentiment score is greater than this threshold, then we consider the tweet as positive (i.e. promoter).
   - **negative**: Range is from 0 to 1. If sentiment is negative and the sentiment score is greater than this threshold, then we consider the tweet as negative (i.e. detractor).
 
