@@ -21,7 +21,7 @@ class BrandMonitoring {
    */
   getStats(reportParams) {
     const params = {
-      twitterUserId: reportParams.twitterUserId,
+      twitterUsername: reportParams.twitterUsername,
       startTimestamp: reportParams.startTimestamp,
       endTimestamp: reportParams.endTimestamp
     };
