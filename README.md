@@ -55,15 +55,22 @@ const brandmonitoring = new BrandMonitoring(twitterApiConfig, awsComprehendConfi
 const reportParams = {
   twitterUserId: '<twitter_user_id>',
   startTimestamp: '<start_timestamp>',
-  endTimestamp: '<end_timestamp>'
+  endTimestamp: '<end_timestamp>',
+  awsThreshold: {
+    positive: '<positive>',
+    negative: '<negative>'
+  }
 };
 
 brandmonitoring.getStats(reportParams);
 ```
 
 **`reportParams`** is an object which contains the twitter account id and the duration.
-- **twitterUserId**: It is the account id of the twitter handle of which you want to generate the stats. You can find your twitter id using this [twitter API](https://developer.twitter.com/en/docs/labs/tweets-and-users/api-reference/get-users-by-username). 
-- **startTimestamp**: It is the start timestamp of the duration in which you want to calculate the statistics.
-- **endTimestamp**: It is the end timestamp of the duration in which you want to calculate the statistics.
-<br>
+- twitterUserId: It is the account id of the twitter handle of which you want to generate the stats. You can find your twitter id using this [twitter API](https://developer.twitter.com/en/docs/labs/tweets-and-users/api-reference/get-users-by-username). 
+- startTimestamp: It is the start timestamp of the duration in which you want to calculate the statistics.
+- endTimestamp: It is the end timestamp of the duration in which you want to calculate the statistics.
+- awsThreshold: It is an object which contains aws threshold values. This is an optional parameter. If not passed or incorrect values passed, default values will be used. 
+  - positive: It is the threshold of aws sentiment used to determine promoters. Range is from 0 to 1.
+  - negative: It is the threshold of aws sentiment used to determine detractors. Range is from 0 to 1.
+
 

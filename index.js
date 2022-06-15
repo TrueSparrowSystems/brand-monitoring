@@ -26,6 +26,8 @@ class BrandMonitoring {
       endTimestamp: reportParams.endTimestamp
     };
 
+    configProvider.setConfig('awsThreshold', reportParams.awsThreshold);
+
     return new GetStats(params).perform();
   }
 }
