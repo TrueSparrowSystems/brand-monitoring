@@ -1,4 +1,5 @@
 # Brand-monitoring
+![npm version](https://img.shields.io/npm/v/@plgworks/brand-monitoring.svg?style=flat)
 
 Brand Monitor helps you understand your twitter audience better. This module provides you with a number of promoters, number of detractors, [Net Promoter Score (NPS)](https://en.wikipedia.org/wiki/Net_promoter_score) and the total number of tweets within a particular time frame.
 
