@@ -11,8 +11,8 @@ We get the sentiments of these tweets using [AWS Comprehend](https://docs.aws.am
 For a large dataset of tweets and their sentiments given by AWS Comprehend, we manually analysed each tweet data and accordingly set the thresholds for sentiment score for deciding who is a promoter and who is a detractor.
 
 ## Prerequisites
-You will need a developer account and should have created a Twitter App.
-You will also need an AWS account.
+- You will need a Twitter developer account and you should have created a Twitter App.
+- You will also need an AWS account.
 
 ## Install NPM
 
@@ -38,13 +38,13 @@ const brandmonitoring = new BrandMonitoring(twitterApiConfig, awsComprehendConfi
 ```
 
 ### Initialization Params
-**1. `twitterApiConfig`** is an object which contains bearer token
+**1. `twitterApiConfig`** is an object which contains bearer token.
 
 - **bearer_token**: It is used to have a more secure point of entry for using the Twitter APIs, and can be obtained from the developer portal inside the keys and tokens section of your App's settings.
 
 **2. `awsComprehendConfig`** is an object which contains AWS Comprehend access credentials.
 
-- **region**: It is the AWS region
+- **region**: It is the AWS region.
 - **access_key_id**: AWS uses this to verify your identity and grant or deny you access to specific resources.
 - **secret_access_key**: AWS uses this to verify your identity and grant or deny you access to specific resources.
 <br>
