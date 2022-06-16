@@ -1,6 +1,6 @@
 {
   "name": "@plgworks/brand-monitoring",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.2",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -13,14 +13,14 @@
   },
   "keywords": [],
   "author": "PLG Works",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/PLG-Works/brand-monitoring/issues"
   },
   "homepage": "https://github.com/PLG-Works/brand-monitoring#readme",
   "dependencies": {
     "@aws-sdk/client-comprehend": "3.105.0",
-    "@plgworks/base": "1.0.0",
+    "@plgworks/base": "^1.0.0",
     "html-entities": "2.1.0",
     "json-bigint": "1.0.0",
     "qs": "6.10.5"

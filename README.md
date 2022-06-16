@@ -73,11 +73,15 @@ const stats = await brandmonitoring.getStats(reportParams).catch(function(err) {
   - **negative**: Range is from 0 to 1. If sentiment is negative and the sentiment score is greater than this threshold, then we consider the tweet as negative (i.e. detractor).
 
 ## Success Response
+`getStats` method returns a promise which returns a stats object as shown in the following.
 ```js
-stats = {
-  nps: -8.333333333333336,
-  promotersCount: 14,
-  detractorsCount: 21,
-  totalTweets: 84
-}
+console.log(stats);
+
+// stats is a object which looks like this:
+//  {
+//      nps: -8.333333333333336,
+//      promotersCount: 14,
+//      detractorsCount: 21,
+//      totalTweets: 84
+//  }
 ```
