@@ -1,0 +1,44 @@
+{
+  "name": "@plgworks/brand-monitoring",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "pre-commit": "lint-staged"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PLG-Works/brand-monitoring.git"
+  },
+  "keywords": [],
+  "author": "PLG Works",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/PLG-Works/brand-monitoring/issues"
+  },
+  "homepage": "https://github.com/PLG-Works/brand-monitoring#readme",
+  "dependencies": {
+    "@aws-sdk/client-comprehend": "3.105.0",
+    "@plgworks/base": "^1.0.0",
+    "html-entities": "2.3.3",
+    "json-bigint": "1.0.0",
+    "qs": "6.10.5"
+  },
+  "devDependencies": {
+    "eslint": "6.5.1",
+    "lint-staged": "8.0.3",
+    "pre-commit": "1.2.2",
+    "prettier": "1.14.3",
+    "commander": "7.1.0"
+  },
+  "pre-commit": [
+    "pre-commit"
+  ],
+  "lint-staged": {
+    "*.js": [
+      "prettier --write --config .prettierrc.json",
+      "git add"
+    ]
+  }
+}
